@@ -60,7 +60,6 @@ def tela_login():
         if st.button("Entrar", use_container_width=True):
             if user in st.session_state.users and st.session_state.users[user] == password:
                 st.session_state.logged_in_user = user
-                st.hybrid_js = "" # Limpeza interna de segurança
                 st.rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
