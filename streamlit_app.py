@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="Bolão Copa do Mundo 2026", layout="wide")
 
 # -------------------------------------------------------------------------
-# DATABASE SIMULADO (Em produção, substitua por Banco de Dados Real)
+# DATABASE SIMULADO
 # -------------------------------------------------------------------------
 if "users" not in st.session_state:
     st.session_state.users = {"admin": "123", "usuario1": "senha1"}
@@ -13,20 +13,18 @@ if "users" not in st.session_state:
 if "logged_in_user" not in st.session_state:
     st.session_state.logged_in_user = None
 
-# Palpites salvos: { usuario: { id_jogo: (gols_casa, gols_fora) } }
 if "palpites" not in st.session_state:
     st.session_state.palpites = {}
 
-# Dados reais dos jogos da 1ª rodada (Exemplo para o Grupo A)
+# Dados de exemplo dos jogos
 jogos_copa = [
     {"id": 1, "grupo": "Grupo A", "casa": "México", "fora": "África do Sul", "placar_casa": None, "placar_fora": None},
     {"id": 2, "grupo": "Grupo A", "casa": "Coreia do Sul", "fora": "Tchéquia", "placar_casa": None, "placar_fora": None},
 ]
 
-# Resultados Oficiais Simulados
 jogos_oficiais = {
-    1: (2, 1),  # id: (gols_casa, gols_fora)
-    2: None     # Ainda não aconteceu
+    1: (2, 1),
+    2: None
 }
 
 # -------------------------------------------------------------------------
@@ -38,11 +36,9 @@ def calcular_pontos(palpite, oficial):
     g_casa_p, g_fora_p = palpite
     g_casa_o, g_fora_o = oficial
     
-    # Placar exato
     if g_casa_p == g_casa_o and g_fora_p == g_fora_o:
         return 3
         
-    # Vitória simples ou empate simples
     if (g_casa_p > g_fora_p and g_casa_o > g_fora_o) or \
        (g_casa_p < g_fora_p and g_casa_o < g_fora_o) or \
        (g_casa_p == g_fora_p and g_casa_o == g_fora_o):
@@ -64,6 +60,7 @@ def tela_login():
         if st.button("Entrar", use_container_width=True):
             if user in st.session_state.users and st.session_state.users[user] == password:
                 st.session_state.logged_in_user = user
+                st.hybrid_js = "" # Limpeza interna de segurança
                 st.rerun()
             else:
                 st.error("Usuário ou senha incorretos.")
@@ -81,7 +78,7 @@ def tela_login():
                 st.success("Cadastro realizado com sucesso! Vá para a aba de Login.")
 
 # -------------------------------------------------------------------------
-# TELA PRINCIPAL (APÓS LOGIN)
+# TELA PRINCIPAL
 # -------------------------------------------------------------------------
 def tela_principal():
     usuario_atual = st.session_state.logged_in_user
@@ -95,15 +92,13 @@ def tela_principal():
     st.title("⚽ Dashboard do Bolão")
     st.write("---")
     
-    # Abas do Menu Principal
     tab1, tab2, tab3 = st.tabs(["📊 Classificação dos Grupos", "✍️ Registrar Palpites", "🏅 Ranking Geral"])
     
-    # ABA 1: Classificação dos Grupos (Corrigida e expandida)
+    # ABA 1: Classificação dos Grupos
     with tab1:
         st.subheader("Classificação - Copa do Mundo")
         grupo_selecionado = st.selectbox("Escolha o Grupo", ["Grupo A", "Grupo B", "Grupo C", "Grupo D"])
         
-        # Dicionário contendo os times reais de cada grupo (Layout conforme imagem enviada)
         times_por_grupo = {
             "Grupo A": ["🇲🇽 México", "🇿🇦 África do Sul", "🇰🇷 Coreia do Sul", "🇨🇿 Tchéquia"],
             "Grupo B": ["🇨🇦 Canadá", "🇵🇹 Portugal", "🇬🇭 Gana", "🇮🇶 Iraque"],
@@ -124,8 +119,6 @@ def tela_principal():
             df = pd.DataFrame(dados_grupo)
             df.index = df.index + 1
             st.table(df)
-        else:
-            st.info(f"Dados do {grupo_selecionado} estarão disponíveis assim que definidos.")
 
     # ABA 2: Registrar Palpites
     with tab2:
