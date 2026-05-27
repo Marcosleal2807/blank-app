@@ -86,8 +86,7 @@ def tela_login():
 def tela_principal():
     usuario_atual = st.session_state.logged_in_user
     
-    # Barra Superior Corrigida sem o subheader=None
-    col_user, col_logout = st.columns([8, 2])
+    col_user, col_logout = st.columns()
     col_user.markdown(f"👋 Bem-vindo, **{usuario_atual}**!")
     if col_logout.button("Sair da Conta"):
         st.session_state.logged_in_user = None
@@ -99,20 +98,28 @@ def tela_principal():
     # Abas do Menu Principal
     tab1, tab2, tab3 = st.tabs(["📊 Classificação dos Grupos", "✍️ Registrar Palpites", "🏅 Ranking Geral"])
     
-    # ABA 1: Classificação dos Grupos
+    # ABA 1: Classificação dos Grupos (Corrigida e expandida)
     with tab1:
         st.subheader("Classificação - Copa do Mundo")
         grupo_selecionado = st.selectbox("Escolha o Grupo", ["Grupo A", "Grupo B", "Grupo C", "Grupo D"])
         
-        if grupo_selecionado == "Grupo A":
+        # Dicionário contendo os times reais de cada grupo (Layout conforme imagem enviada)
+        times_por_grupo = {
+            "Grupo A": ["🇲🇽 México", "🇿🇦 África do Sul", "🇰🇷 Coreia do Sul", "🇨🇿 Tchéquia"],
+            "Grupo B": ["🇨🇦 Canadá", "🇵🇹 Portugal", "🇬🇭 Gana", "🇮🇶 Iraque"],
+            "Grupo C": ["🇺🇸 Estados Unidos", "🇺🇾 Uruguai", "🇲🇦 Marrocos", "🇫🇮 Finlândia"],
+            "Grupo D": ["🇧🇷 Brasil", "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra", "🇪🇬 Egito", "🇦🇺 Austrália"]
+        }
+        
+        if grupo_selecionado in times_por_grupo:
             dados_grupo = {
-                "Equipe": ["🇲🇽 México", "🇿🇦 África do Sul", "🇰🇷 Coreia do Sul", "🇨🇿 Tchéquia"],
-                "PJ": [0, 0, 0, 0],
-                "VIT": [0, 0, 0, 0],
-                "E": [0, 0, 0, 0],
-                "DER": [0, 0, 0, 0],
-                "SG": [0, 0, 0, 0],
-                "Pts": [0, 0, 0, 0]
+                "Equipe": times_por_grupo[grupo_selecionado],
+                "PJ":,
+                "VIT":,
+                "E":,
+                "DER":,
+                "SG":,
+                "Pts":
             }
             df = pd.DataFrame(dados_grupo)
             df.index = df.index + 1
@@ -130,17 +137,17 @@ def tela_principal():
         with st.form("form_palpites"):
             for jogo in jogos_copa:
                 st.markdown(f"#### {jogo['grupo']}")
-                col1, col2, col3, col4, col5 = st.columns([3, 2, 1, 2, 3])
+                col1, col2, col3, col4, col5 = st.columns()
                 
                 with col1:
                     st.write(f"**{jogo['casa']}**")
                 with col2:
-                    prev_casa = st.session_state.palpites[usuario_atual].get(jogo['id'], (0,0))[0]
+                    prev_casa = st.session_state.palpites[usuario_atual].get(jogo['id'], (0,0))
                     gols_c = st.number_input("", min_value=0, max_value=20, value=prev_casa, key=f"c_{jogo['id']}")
                 with col3:
                     st.write("X")
                 with col4:
-                    prev_fora = st.session_state.palpites[usuario_atual].get(jogo['id'], (0,0))[1]
+                    prev_fora = st.session_state.palpites[usuario_atual].get(jogo['id'], (0,0))
                     gols_f = st.number_input("", min_value=0, max_value=20, value=prev_fora, key=f"f_{jogo['id']}")
                 with col5:
                     st.write(f"**{jogo['fora']}**")
